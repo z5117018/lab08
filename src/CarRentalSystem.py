@@ -1,4 +1,10 @@
 from src.Booking import Booking
+from datetime import datetime
+from src.Location import *
+class BookingException(Exception):
+    def __init__(self, field, msg=None):
+        self._field = field
+        self._msg = msg
 
 
 class CarRentalSystem:
@@ -22,8 +28,23 @@ class CarRentalSystem:
                 cars.append(car)
         return cars
 
-    def make_booking(self, customer, period, car, location):
-        new_booking = Booking(customer, period, car, location)
+    def make_booking(self, customer, start, end, car, pickup, dropoff):
+
+        if (start is None):
+            raise BookingException('start_date','Specify a valid start date ')
+        if (end is None):
+            raise BookingException('end_date','Specify a valid end date ')
+        if (pickup is None):
+            raise BookingException('pickup','Specify a valid pickup ')
+        if (dropoff is None):
+            raise BookingException('dropff','Specify a valid dropoff ')
+        date_format = "%Y-%m-%d"
+        start_date = datetime.strptime(start, date_format)
+        end_date = datetime.strptime(end, date_format)
+        if (start_date > end_date):
+            raise BookingException('period','Specify valid booking period')
+        location = Location(pickup, dropoff)
+        new_booking = Booking(customer, start_date,end_date , car, location)
         self._bookings.append(new_booking)
         car.add_booking(new_booking)
         return new_booking

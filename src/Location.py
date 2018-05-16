@@ -1,5 +1,7 @@
 class Location:
     def __init__(self, pickup, dropoff):
+        if (pickup is None or dropoff is None):
+            raise ValueError
         self._pickup = pickup
         self._dropoff = dropoff
 

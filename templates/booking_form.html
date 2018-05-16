@@ -8,6 +8,9 @@
 <div>
   <form method="POST">
     <div>
+      {% if msg %}
+        <h3>{{msg}}</h3> 
+      {% endif %}
       <input {% if confirmation %}readonly value="{{form['start']}}"{% endif %} name="start">Start Location</input>
       <br/>
       <input {% if confirmation %}readonly value="{{form['end']}}"{% endif %} name="end">End Location</input>

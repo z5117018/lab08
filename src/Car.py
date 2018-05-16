@@ -31,6 +31,8 @@ class Car(ABC):
     def add_booking(self, booking):
         self._bookings.append(booking)
 
+    def get_rate(self):
+        return self._daily_rate
 
 class SmallCar(Car):
 

@@ -3,7 +3,11 @@ from flask_login import current_user, login_required, login_user, logout_user
 from server import app, system
 from datetime import datetime
 from src.Location import Location
+from src.Customer import Customer
+from src.CarRentalSystem import *
 
+c = Customer("user","pass","c")
+system.new_customer(c)
 
 @app.route('/')
 def home():
@@ -74,10 +78,30 @@ def book(rego):
     if car is None:
         abort(404)
     if request.method == 'POST':
-        date_format = "%Y-%m-%d"
-        start_date = datetime.strptime(request.form['start_date'], date_format)
-        end_date = datetime.strptime(request.form['end_date'], date_format)
-        diff = end_date - start_date
+        # date_format = "%Y-%m-%d"
+        # start_date = datetime.strptime(request.form['start_date'], date_format)
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+        pickup = request.form['start']
+        dropoff = request.form['end']
+        print("start date is ",start_date)
+        if (pickup == ''):
+            pickup = None
+        if (dropoff  == ''):
+            dropoff = None
+        if (start_date == ''):
+            start_date = None
+        if (end_date == ''):
+            end_date = None
+        # location = Location(start, end)
+        try:
+            booking = system.make_booking(current_user, start_date,end_date, car, pickup, dropoff)
+        except BookingException as errmsg:
+            return render_template('booking_form.html', car=car, msg=errmsg.args[1])
+
+        print("booking is ",booking)
+        # end_date = datetime.strptime(request.form['end_date'], date_format)
+        diff = booking.get_period()
         if 'check' in request.form:
             fee = car.get_fee(diff.days)
             return render_template(
@@ -88,10 +112,10 @@ def book(rego):
                 fee=fee
             )
         elif 'confirm' in request.form:
-            location = Location(request.form['start'], request.form['end'])
-            booking = system.make_booking(current_user, diff, car, location)
+            # location = Location(request.form['start'], request.form['end'])
+            # booking = system.make_booking(current_user, diff, car, location)
             return render_template('booking_confirm.html', booking=booking)
-    return render_template('booking_form.html', car=car)
+    return render_template('booking_form.html', car=car, msg=None)
 
 
 @app.route('/cars/<rego>/bookings')
